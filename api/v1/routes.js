@@ -3,9 +3,9 @@ var router = express.Router();
 var schedule = require('node-schedule');
 var bodyparser = require('body-parser');
 var validation = require('./functions');
+var scheduler = require('node-schedule');
 
 router.use(bodyparser.json());
-// router.
 
 // Home page route.
 router.post('/', function (req, res) {
@@ -13,18 +13,21 @@ router.post('/', function (req, res) {
 	var timedata = req.query.timedata;
 	console.log(datedata,timedata);
 	var dtv = validation.datetimevalidation(datedata,timedata);
-	dtv.then((message)=>{
-		console.log(message);
+	dtv.then((time)=>{
+		// console.log(message);
+		var job = scheduler.scheduleJob(time,()=>console.log("i am doing your work at time",time));
+		res.send("your work is scheduled at "+time);
 	})
 	.catch((message)=>{
 		console.log(message);
+		res.send(message);
 	});
 
 
 	var date = new Date();
 	console.log(date);
 
-  res.send('home page');
+  
 });
 
 // About page route.
