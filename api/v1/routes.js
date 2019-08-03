@@ -7,14 +7,14 @@ var scheduler = require('node-schedule');
 
 router.use(bodyparser.json());
 
-// Home page route.
+// date and time setter
 router.post('/', function (req, res) {
 	var datedata = req.query.datedata;
 	var timedata = req.query.timedata;
-	console.log(datedata,timedata);
+	// console.log(datedata,timedata);
 	var dtv = validation.datetimevalidation(datedata,timedata);
 	dtv.then((time)=>{
-		// console.log(message);
+		console.log(time);
 		var job = scheduler.scheduleJob(time,()=>console.log("i am doing your work at time",time));
 		res.send("your work is scheduled at "+time);
 	})
@@ -22,12 +22,6 @@ router.post('/', function (req, res) {
 		console.log(message);
 		res.send(message);
 	});
-
-
-	var date = new Date();
-	console.log(date);
-
-  
 });
 
 // About page route.
