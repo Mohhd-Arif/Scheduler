@@ -57,6 +57,14 @@ router.patch('/update_scheduledwork',(req,res)=>{
 	});
 });
 
+router.post('/repeating_schedulework',(req,res)=>{
+	var rule = new schedule.RecurrenceRule();
+	rule.minute = 28;
+	var job = schedule.scheduleJob(rule,()=>console.log("i am ready to work"));
+	console.log(job);
+	res.send(job);
+})
+
 
 router.patch('/edit_schedule')
 module.exports = router;
