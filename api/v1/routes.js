@@ -58,13 +58,20 @@ router.patch('/update_scheduledwork',(req,res)=>{
 });
 
 router.post('/repeating_schedulework',(req,res)=>{
+	var setMinute = req.query.setMinute;
+	var setHour = req.query.setHour;
+	if(!setMinute){
+		setMinute=0;
+	};
+	if(setHour<0||setHour>24||setMinute<0||setMinute>60){
+		res.send("time format is wrong")
+	}
 	var rule = new schedule.RecurrenceRule();
-	rule.minute = 28;
+	rule.hour = setHour;
+	rule.minute = setMinute;
 	var job = schedule.scheduleJob(rule,()=>console.log("i am ready to work"));
 	console.log(job);
-	res.send(job);
-})
+	res.send("your schedule is been registered");
+});
 
-
-router.patch('/edit_schedule')
 module.exports = router;
