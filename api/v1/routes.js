@@ -1,77 +1,22 @@
-var express = require('express');
-var router = express.Router();
-var schedule = require('node-schedule');
-var bodyparser = require('body-parser');
-var validation = require('./functions');
-var scheduler = require('node-schedule');
+const express = require('express');
+const routerV2 = express.Router();
+const taskHandler = require('./taskHandler');
+const bodyparser = require('body-parser');
 
-router.use(bodyparser.json());
-var scheduled_work_list = 0;
+routerV2.use(bodyparser.json());
 
-// schedule a work
-router.post('/schedulework',(req, res)=> {
-	var datedata = req.query.datedata;
-	var timedata = req.query.timedata;
-	// console.log(datedata,timedata);
-	var root = validation.datetimevalidation(datedata,timedata);
-	root.then((date)=>{
-		// console.log(time);
-		var job = scheduler.scheduleJob(date,()=>console.log("i am doing your work at time",date));
-		scheduled_work_list = scheduler.scheduledJobs;
-		res.send("your work is scheduled at "+date+Object.keys(scheduled_work_list));
-	})
-	.catch((message)=>{
-		// console.log(message);
-		res.send(message);
-	});
+routerV2.post('/schedulework',(req,res)=>{
+  let root = taskHandler.scheduleWork(req);
+  root.then(message=>res.send(message)).catch(message=>res.send(message));
 });
 
-// delete a scheduled work
-router.delete('/delete_scheduledwork',(req, res)=> {
-  // console.log(scheduled_work_list);
-	// console.log(Object.keys(scheduled_work_list));
-	var del_job_id = req.query.del_job_id;
-	var root = validation.id_validation(scheduled_work_list,del_job_id);
-	root.then((bool)=>{
-		if(bool){
-			scheduled_work_list[del_job_id].cancel();
-		}
-		res.send(del_job_id+" is been deleted \n remaining tasks "+scheduled_work_list);
-	}).catch((message)=>{
-		res.send(message);
-	})
+routerV2.delete('/delete_scheduledwork',(req,res)=>{
+  let root = taskHandler.deleteScheduledwork(req);
+  root.then(message=>res.send(message)).catch(message=>res.send(message));
 });
 
-router.patch('/update_scheduledwork',(req,res)=>{
-	var datedata = req.query.datedata;
-	var timedata = req.query.timedata;
-	var del_job_id = req.query.del_job_id;
-	var root = validation.id_validation(scheduled_work_list,del_job_id);
-	var root1 = validation.datetimevalidation(datedata,timedata);
-	Promise.all([root,root1]).then((date)=>{
-		console.log(Object.keys(date));
-		scheduled_work_list[del_job_id].reschedule(date[1]);
-		res.send("your schedule having id=>"+del_job_id+"is updated");
-	}).catch((message)=>{
-		res.send(message);
-	});
+routerV2.patch('/update_scheduledwork',(req,res)=>{
+  let root = taskHandler.updateScheduledWork(req);
+  root.then(message=>res.send(message)).catch(message=>res.send(message));
 });
-
-router.post('/repeating_schedulework',(req,res)=>{
-	var setMinute = req.query.setMinute;
-	var setHour = req.query.setHour;
-	if(!setMinute){
-		setMinute=0;
-	};
-	if(setHour<0||setHour>24||setMinute<0||setMinute>60){
-		res.send("time format is wrong")
-	}
-	var rule = new schedule.RecurrenceRule();
-	rule.hour = setHour;
-	rule.minute = setMinute;
-	var job = schedule.scheduleJob(rule,()=>console.log("i am ready to work"));
-	console.log(job);
-	res.send("your schedule is been registered");
-});
-
-module.exports = router;
+module.exports = routerV2;
