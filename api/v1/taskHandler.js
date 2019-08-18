@@ -17,6 +17,8 @@ function scheduleWork(req){
 
 });
 }
+
+
 function deleteScheduledwork(req){
   return new Promise((resolve,reject)=>{
     let del_job_id = req.query.del_job_id;
@@ -29,6 +31,7 @@ function deleteScheduledwork(req){
   })
 }
 
+
 function updateScheduledWork(req){
   return new Promise((resolve,reject)=>{
     let update_job_id = req.query.update_job_id;
@@ -39,10 +42,8 @@ function updateScheduledWork(req){
     Promise.all([root,root1]).then((data)=>{
   		scheduled_work_list[update_job_id].reschedule(data[1]);
       resolve("your schedule having id=>"+update_job_id+"is updated")
-  		// res.send("your schedule having id=>"+update_job_id+"is updated");
   	}).catch((message)=>{
       reject(message);
-  		// res.send(message);
   	});
   })
 }
@@ -106,7 +107,10 @@ function id_validation(job_id){
   });
 }
 
-module.exports = {scheduleWork,
+
+
+module.exports = {
+									scheduleWork,
                   deleteScheduledwork,
                   updateScheduledWork
 }
